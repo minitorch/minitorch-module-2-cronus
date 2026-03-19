@@ -62,7 +62,8 @@ def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
     """
     # TODO: Implement for Task 2.1.
     #raise NotImplementedError("Need to implement for Task 2.1")
-    dim = shape.size
+    dim = len(shape)
+    #print("dim: "+ str(dim))
     #print(str(shape) + " ordinal: " + str(ordinal))
     strides = strides_from_shape(shape)
 
@@ -95,8 +96,20 @@ def broadcast_index(
         None
     """
     # TODO: Implement for Task 2.2.
-    raise NotImplementedError("Need to implement for Task 2.2")
+    #raise NotImplementedError("Need to implement for Task 2.2")
+    reversed_big_index = reversed(big_index)
+    reversed_shape     = reversed(shape)
+    reversed_out_index = reversed_big_index
 
+    # delete additonal dimision if shape < big_shape
+    if (len(shape) < len(big_shape)):
+        del reversed_out_index[len(shape):]
+    
+    for i in range(len(shape)):
+        if (reversed_shape[i] == 1):
+            reversed_out_index[i] = 0
+    
+    return reversed(reversed_out_index)
 
 def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
     """
@@ -113,8 +126,33 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
         IndexingError : if cannot broadcast
     """
     # TODO: Implement for Task 2.2.
-    raise NotImplementedError("Need to implement for Task 2.2")
+    #raise NotImplementedError("Need to implement for Task 2.2")
+    #print(shape1)
+    #print(shape2)
+    # check whether 2 shapes are broadcastable
+    if (len(shape1) > len(shape2)):
+        big_shape = shape1[::-1]
+        small_shape = shape2[::-1]
+    else:
+        big_shape = shape2[::-1]
+        small_shape = shape1[::-1]
+    
+    #print(big_shape)
+    #print(small_shape)
+    # check whetehr broadcastable
+    for big_element, small_element in zip(big_shape, small_shape):
+        if not ((big_element == small_element) or (big_element == 1) or (small_element == 1)):
+            raise IndexingError("Cannot broadcast")
+    
+    reversed_broadcasted_shape = list(big_shape)
+    
+    for i, small_element in enumerate(small_shape):
+        if (big_shape[i] == 1):
+            reversed_broadcasted_shape[i] = small_element
+    
+    #print(reversed_broadcasted_shape)
 
+    return tuple(reversed(reversed_broadcasted_shape))
 
 def strides_from_shape(shape: UserShape) -> UserStrides:
     layout = [1]
