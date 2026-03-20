@@ -269,7 +269,16 @@ def tensor_map(fn: Callable[[float], float]) -> Any:
         in_strides: Strides,
     ) -> None:
         # TODO: Implement for Task 2.3.
-        raise NotImplementedError("Need to implement for Task 2.3")
+        #raise NotImplementedError("Need to implement for Task 2.3")
+        
+        if (in_shape == out_shape):
+            # Simple Version
+            for i in range(index_to_position(in_shape, in_strides)):
+                out[i] = fn(in_storage[i])
+        else:
+            # Broadcasted Version
+            for i in range(index_to_position(in_shape, in_strides)):
+                out[i] = fn(in_storage[i])
 
     return _map
 
@@ -319,7 +328,18 @@ def tensor_zip(fn: Callable[[float, float], float]) -> Any:
         b_strides: Strides,
     ) -> None:
         # TODO: Implement for Task 2.3.
-        raise NotImplementedError("Need to implement for Task 2.3")
+        #raise NotImplementedError("Need to implement for Task 2.3")
+        
+        if (a_shape == out_shape):
+            # Simple Version
+            for i in range(index_to_position(a_shape, a_strides)):
+                out[i] = fn(a_storage[i], b_storage[i])
+        else:
+            # Broadcasted Version
+            for i in range(index_to_position(a_shape, a_strides)):
+                out[i] = fn(a_storage[i], b_storage[i])
+
+        
 
     return _zip
 
@@ -355,7 +375,16 @@ def tensor_reduce(fn: Callable[[float, float], float]) -> Any:
         reduce_dim: int,
     ) -> None:
         # TODO: Implement for Task 2.3.
-        raise NotImplementedError("Need to implement for Task 2.3")
+        #raise NotImplementedError("Need to implement for Task 2.3")
+
+        if (a_shape == out_shape):
+            # Simple Version
+            for i in range(index_to_position(a_shape, a_strides)):
+                out[i] = fn(a_storage[i])
+        else:
+            # Broadcasted Version
+            for i in range(index_to_position(a_shape, a_strides)):
+                out[i] = fn(a_storage[i])
 
     return _reduce
 
