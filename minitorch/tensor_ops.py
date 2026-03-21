@@ -270,11 +270,26 @@ def tensor_map(fn: Callable[[float], float]) -> Any:
     ) -> None:
         # TODO: Implement for Task 2.3.
         #raise NotImplementedError("Need to implement for Task 2.3")
-        
+        print("start map")
+        print("out")
+        print(out)
+        print(out_shape)
+        print(out_strides)
+        print("in")
+        print(in_storage)
+        print(in_shape)
+        print(in_strides)
+
         if all(in_shape == out_shape):
             # Simple Version
             for i in range(len(out)):
-                out[i] = fn(in_storage[i])
+                #out[i] = fn(in_storage[i])
+                out_index: Index = np.array(out_shape)
+                to_index(i, out_shape, out_index)
+                print(out_index)
+                print(index_to_position(out_index, out_strides))
+                print(index_to_position(out_index, in_strides))
+                out[index_to_position(out_index, out_strides)] = fn(in_storage[index_to_position(out_index, in_strides)])
         else:
             # Broadcasted Version
             for i in range(len(out)):
@@ -334,13 +349,18 @@ def tensor_zip(fn: Callable[[float, float], float]) -> Any:
     ) -> None:
         # TODO: Implement for Task 2.3.
         #raise NotImplementedError("Need to implement for Task 2.3")
-        print("start")
+        print("start zip")
+        print("a")
         print(a_storage)
         print(a_strides)
         print(a_shape)
+        print("b")
         print(b_storage)
         print(b_strides)
         print(b_shape)
+        print("out")
+        print(out)
+        print(out_strides)
         print(out_shape)
         print("end")
         
@@ -349,33 +369,50 @@ def tensor_zip(fn: Callable[[float, float], float]) -> Any:
             #print("tensor_zip Simple Version")
             for i in range(len(out)):
                 out_index: Index = np.array(out_shape)
-                #a_index: Index  = np.array(a_shape)
-                #b_index: Index  = np.array(b_shape)
+                a_index: Index  = np.array(a_shape)
+                b_index: Index  = np.array(b_shape)
                 to_index(i, out_shape, out_index)
+                print("out_index")
                 print(out_index)
-                #broadcast_index(out_index, out_shape, a_shape, a_index)
-                #broadcast_index(out_index, out_shape, b_shape, b_index)
-                #out[i] = fn(a_storage[index_to_position(out_index, a_strides)], b_storage[index_to_position(out_index, b_shape)])
-                out[i] = fn(a_storage[i], b_storage[i])
+                print(index_to_position(out_index, out_strides))
+                broadcast_index(out_index, out_shape, a_shape, a_index)
+                broadcast_index(out_index, out_shape, b_shape, b_index)
+                print("abindex:")
+                print(a_index)
+                print(index_to_position(a_index, a_strides))
+                print(b_index)
+                print(index_to_position(b_index, b_strides))
+                print("abindexend")
+                print("fn:" + str(fn))
+                out[index_to_position(out_index, out_strides)] = fn(a_storage[index_to_position(a_index, a_strides)], b_storage[index_to_position(b_index, b_strides)])
+                #out[i] = fn(a_storage[i], b_storage[i])
         else:
             # Broadcasted Version
             for i in range(len(out)):
                 out_index: Index = np.array(out_shape)
                 a_index: Index  = np.array(a_shape)
                 b_index: Index  = np.array(b_shape)
+                print(out_index)
                 to_index(i, out_shape, out_index)
-                #print(out_index)
-                #print("qqq")
-                #print(a_index)
-                #print(b_index)
-                #print("aaaa")
+                print("out_index")
+                print(out_index)
+                print(index_to_position(out_index, out_strides))
+                print("qqq")
+                print(a_index)
+                print(b_index)
+                print("aaaa")
+                print(out_index)
                 broadcast_index(out_index, out_shape, a_shape, a_index)
+                print(out_index)
                 broadcast_index(out_index, out_shape, b_shape, b_index)
-                #print("ab1")
-                #print(a_index)
-                #print(b_index)
-                #print("ab2")
-                out[i] = fn(a_storage[index_to_position(a_index, a_strides)], b_storage[index_to_position(b_index, b_shape)])
+                print("abindex:")
+                print(a_index)
+                print(index_to_position(a_index, a_strides))
+                print(b_index)
+                print(index_to_position(b_index, b_strides))
+                print("abindexend")
+                print("fn:" + str(fn))
+                out[i] = fn(a_storage[index_to_position(a_index, a_strides)], b_storage[index_to_position(b_index, b_strides)])
         
 
     return _zip
