@@ -97,19 +97,20 @@ def broadcast_index(
     """
     # TODO: Implement for Task 2.2.
     #raise NotImplementedError("Need to implement for Task 2.2")
-    reversed_big_index = reversed(big_index)
-    reversed_shape     = reversed(shape)
+    reversed_big_index = big_index[::-1]
+    reversed_shape     = shape[::-1]
     reversed_out_index = reversed_big_index
-
+    
     # delete additonal dimision if shape < big_shape
     if (len(shape) < len(big_shape)):
-        del reversed_out_index[len(shape):]
+        reversed_out_index = reversed_out_index[0:len(shape)]
     
     for i in range(len(shape)):
         if (reversed_shape[i] == 1):
             reversed_out_index[i] = 0
-    
-    return reversed(reversed_out_index)
+    out_index_temp = reversed_out_index[::-1]
+    for i in range(len(shape)):
+        out_index[i] = out_index_temp[i]
 
 def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
     """
