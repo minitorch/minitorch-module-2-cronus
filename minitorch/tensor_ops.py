@@ -355,7 +355,8 @@ def tensor_zip(fn: Callable[[float, float], float]) -> Any:
                 print(out_index)
                 #broadcast_index(out_index, out_shape, a_shape, a_index)
                 #broadcast_index(out_index, out_shape, b_shape, b_index)
-                out[i] = fn(a_storage[index_to_position(out_index, a_strides)], b_storage[index_to_position(out_index, b_shape)])
+                #out[i] = fn(a_storage[index_to_position(out_index, a_strides)], b_storage[index_to_position(out_index, b_shape)])
+                out[i] = fn(a_storage[i], b_storage[i])
         else:
             # Broadcasted Version
             for i in range(len(out)):
