@@ -22,8 +22,19 @@ def central_difference(f: Any, *vals: Any, arg: int = 0, epsilon: float = 1e-6) 
     Returns:
         An approximation of $f'_i(x_0, \ldots, x_{n-1})$
     """
-    raise NotImplementedError("Need to include this file from past assignment.")
-
+    # TODO: Implement for Task 1.1.
+    #raise NotImplementedError("Need to implement for Task 1.1")
+    
+        
+    if arg == 0:
+        delta_vals = (vals[0] + epsilon,) + vals[1:]
+    elif arg == len(vals) - 1:
+        delta_vals = vals[0:arg - 2] + (vals[-1] + epsilon,)
+    else:
+        delta_vals = vals[0:arg - 1] + (vals[arg] + epsilon,) + vals[arg+1:]
+    
+    
+    return (f(*delta_vals) - f(*vals))/epsilon
 
 variable_count = 1
 
@@ -60,8 +71,18 @@ def topological_sort(variable: Variable) -> Iterable[Variable]:
     Returns:
         Non-constant Variables in topological order starting from the right.
     """
-    raise NotImplementedError("Need to include this file from past assignment.")
-
+    # TODO: Implement for Task 1.4.
+    #raise NotImplementedError("Need to implement for Task 1.4")
+    visited_node = [variable]
+    #print(variable)
+    #print("is_leaf")
+    #print(variable.is_leaf())
+    if not variable.is_leaf():
+        for parent in variable.parents:
+            visited_node += topological_sort(parent)
+    #print("after topo sort:")
+    #print(visited_node)
+    return visited_node
 
 def backpropagate(variable: Variable, deriv: Any) -> None:
     """
@@ -74,7 +95,24 @@ def backpropagate(variable: Variable, deriv: Any) -> None:
 
     No return. Should write to its results to the derivative values of each leaf through `accumulate_derivative`.
     """
-    raise NotImplementedError("Need to include this file from past assignment.")
+    # TODO: Implement for Task 1.4.
+    #raise NotImplementedError("Need to implement for Task 1.4")
+    
+    # dict for variable and derivatives
+    variable.derivative = deriv
+    for sorted_var in topological_sort(variable):
+        #print(sorted_var)
+        if (not sorted_var.is_leaf()):
+            for (var, local_deriv) in sorted_var.chain_rule(sorted_var.derivative):
+                #print("var:" + str(var.unique_id))
+                #print(var)
+                #print("local_deriv:")
+                #print(local_deriv)
+                if (var.is_leaf()):
+                    var.accumulate_derivative(local_deriv)
+                else:
+                    var.derivative = local_deriv
+            
 
 
 @dataclass
