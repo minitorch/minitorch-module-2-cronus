@@ -41,6 +41,7 @@ class Function:
 
     @classmethod
     def apply(cls, *vals: Tensor) -> Tensor:
+        #print("inside apply:")
         raw_vals = []
         need_grad = False
         for v in vals:
@@ -61,6 +62,10 @@ class Function:
         back = None
         if need_grad:
             back = minitorch.History(cls, ctx, vals)
+        #print(back)
+        #for v in vals:
+        #    print("vals hisotry:")
+        #    print(v.history)
         return minitorch.Tensor(c._tensor, back, backend=c.backend)
 
 
@@ -128,8 +133,7 @@ class Sigmoid(Function):
         # TODO: Implement for Task 2.4.
         #raise NotImplementedError("Need to implement for Task 2.4")
         (t1,) = ctx.saved_tensors
-        return
-        #return grad_output.f.sigmoid_map(t1) * (1 - grad_output.f.sigmoid_map(t1)) * grad_output
+        return grad_output.f.sigmoid_map(t1) * grad_output - grad_output.f.sigmoid_map(t1) * grad_output.f.sigmoid_map(t1) * grad_output
         
 
 
@@ -212,7 +216,8 @@ class LT(Function):
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, Tensor]:
         # TODO: Implement for Task 2.4.
-        raise NotImplementedError("Need to implement for Task 2.4")
+        #raise NotImplementedError("Need to implement for Task 2.4")
+        return 0
 
 
 class EQ(Function):
@@ -225,7 +230,8 @@ class EQ(Function):
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, Tensor]:
         # TODO: Implement for Task 2.4.
-        raise NotImplementedError("Need to implement for Task 2.4")
+        #raise NotImplementedError("Need to implement for Task 2.4")
+        return 0
 
 
 class IsClose(Function):
@@ -241,12 +247,17 @@ class Permute(Function):
     def forward(ctx: Context, a: Tensor, order: Tensor) -> Tensor:
         # TODO: Implement for Task 2.3.
         #raise NotImplementedError("Need to implement for Task 2.3")
-        return a.permute(order)
+        ctx.save_for_backward(a, order)
+        order2 = [int(order.to_numpy()[i]) for i in range(order.size)]
+        return minitorch.Tensor(a._tensor.permute(*order2))
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, float]:
         # TODO: Implement for Task 2.4.
-        raise NotImplementedError("Need to implement for Task 2.4")
+        #raise NotImplementedError("Need to implement for Task 2.4")
+        (a, order) = ctx.saved_tensors
+        order2 = [int(order.to_numpy()[i]) for i in range(order.size)]
+        return minitorch.Tensor(grad_output._tensor.permute(*order2))
 
 
 class View(Function):

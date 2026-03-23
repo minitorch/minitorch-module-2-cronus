@@ -337,6 +337,9 @@ class Tensor:
 
     def is_leaf(self) -> bool:
         "True if this variable created by the user (no `last_fn`)"
+        #print("inside is_leaf: ")
+        #print(self.history)
+        #print(self.history.last_fn)
         return self.history is not None and self.history.last_fn is None
 
     def is_constant(self) -> bool:
@@ -361,9 +364,12 @@ class Tensor:
         ]
 
     def backward(self, grad_output: Optional[Tensor] = None) -> None:
+        print("Tensor backward:")
+        print(self)
         if grad_output is None:
             assert self.shape == (1,), "Must provide grad_output if non-scalar"
             grad_output = Tensor.make([1.0], (1,), backend=self.backend)
+        print(grad_output)
         backpropagate(self, grad_output)
 
     def zero_grad_(self) -> None:  # pragma: no cover
