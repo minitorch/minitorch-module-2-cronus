@@ -270,15 +270,15 @@ def tensor_map(fn: Callable[[float], float]) -> Any:
     ) -> None:
         # TODO: Implement for Task 2.3.
         #raise NotImplementedError("Need to implement for Task 2.3")
-        #print("start map")
-        #print("out")
-        #print(out)
-        #print(out_shape)
-        #print(out_strides)
-        #print("in")
-        #print(in_storage)
-        #print(in_shape)
-        #print(in_strides)
+        print("start map")
+        print("out")
+        print(out)
+        print(out_shape)
+        print(out_strides)
+        print("in")
+        print(in_storage)
+        print(in_shape)
+        print(in_strides)
 
         if all(in_shape == out_shape):
             # Simple Version

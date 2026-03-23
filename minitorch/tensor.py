@@ -351,13 +351,29 @@ class Tensor:
         return self.history.inputs
 
     def chain_rule(self, d_output: Any) -> Iterable[Tuple[Variable, Any]]:
+        print("chain_rule:")
+        print(self)
+        print(d_output)
         h = self.history
+        print(h)
         assert h is not None
         assert h.last_fn is not None
         assert h.ctx is not None
 
         x = h.last_fn._backward(h.ctx, d_output)
+        print("x:")
+        print(x)
+        print(len(x))
+        print("h.inputs:")
+        print(h.inputs)
+        print(len(h.inputs))
         assert len(x) == len(h.inputs), f"Bug in function {h.last_fn}"
+        for inp, d_in in zip(h.inputs, x):
+            print("inp:")
+            print(inp)
+            print("d_in:")
+            print(d_in)
+            print(self._ensure_tensor(d_in))
         return [
             (inp, inp.expand(self._ensure_tensor(d_in)))
             for inp, d_in in zip(h.inputs, x)

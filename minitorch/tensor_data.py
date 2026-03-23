@@ -133,8 +133,9 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
     """
     # TODO: Implement for Task 2.2.
     #raise NotImplementedError("Need to implement for Task 2.2")
-    #print(shape1)
-    #print(shape2)
+    print("Inside shape_broadcast:")
+    print(shape1)
+    print(shape2)
     # check whether 2 shapes are broadcastable
     if (len(shape1) > len(shape2)):
         big_shape = shape1[::-1]
@@ -148,7 +149,7 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
     # check whetehr broadcastable
     for big_element, small_element in zip(big_shape, small_shape):
         if not ((big_element == small_element) or (big_element == 1) or (small_element == 1)):
-            raise IndexingError("Cannot broadcast")
+            raise IndexingError(f"Cannot broadcast for big element {big_element} and small_element {small_element}")
     
     reversed_broadcasted_shape = list(big_shape)
     
@@ -158,6 +159,7 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
     
     #print(reversed_broadcasted_shape)
 
+    print("Leaving shape_broadcast:")
     return tuple(reversed(reversed_broadcasted_shape))
 
 def strides_from_shape(shape: UserShape) -> UserStrides:
