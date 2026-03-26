@@ -73,13 +73,13 @@ def topological_sort(variable: Variable) -> Iterable[Variable]:
     """
     # TODO: Implement for Task 1.4.
     #raise NotImplementedError("Need to implement for Task 1.4")
-    print("enter topo sort")
+    #print("enter topo sort")
     visited_node = [variable]
     if not variable.is_constant():
         if not variable.is_leaf():
-            print("is_leaf:")
-            print(variable)
-            print(variable.parents)
+            #print("is_leaf:")
+            #print(variable)
+            #print(variable.parents)
             for parent in variable.parents:
                 visited_node += topological_sort(parent)
     #print("after topo sort:")

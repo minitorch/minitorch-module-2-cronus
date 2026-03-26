@@ -41,12 +41,12 @@ class Function:
 
     @classmethod
     def apply(cls, *vals: Tensor) -> Tensor:
-        print("inside apply:")
+        #print("inside apply:")
         raw_vals = []
         need_grad = False
         for v in vals:
-            print("vals hisotry:")
-            print(v.history)
+            #print("vals hisotry:")
+            #print(v.history)
             if v.requires_grad():
                 need_grad = True
             raw_vals.append(v.detach())
@@ -65,8 +65,8 @@ class Function:
         back = None
         if need_grad:
             back = minitorch.History(cls, ctx, vals)
-        print(back)
-        print("exit apply")
+        #print(back)
+        #print("exit apply")
         return minitorch.Tensor(c._tensor, back, backend=c.backend)
 
 
@@ -263,13 +263,13 @@ class Permute(Function):
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, float]:
         # TODO: Implement for Task 2.4.
         #raise NotImplementedError("Need to implement for Task 2.4")
-        print("class Permute backward:")
+        #print("class Permute backward:")
         (a, order) = ctx.saved_tensors
         order3 = [0] * order.size
         for i in range(order.size):
             order3[int(order.to_numpy()[i])] = i 
-        print("order3 in backward:")
-        print(order3)
+        #print("order3 in backward:")
+        #print(order3)
         return minitorch.Tensor(grad_output._tensor.permute(*order3), backend=grad_output.backend), order
 
 
