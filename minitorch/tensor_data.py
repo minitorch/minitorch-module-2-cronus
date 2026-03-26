@@ -44,8 +44,8 @@ def index_to_position(index: Index, strides: Strides) -> int:
     """
 
     # TODO: Implement for Task 2.1.
-    raise NotImplementedError("Need to implement for Task 2.1")
-
+    #raise NotImplementedError("Need to implement for Task 2.1")
+    return np.dot(index, strides)
 
 def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
     """
@@ -61,8 +61,20 @@ def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
 
     """
     # TODO: Implement for Task 2.1.
-    raise NotImplementedError("Need to implement for Task 2.1")
+    #raise NotImplementedError("Need to implement for Task 2.1")
+    dim = len(shape)
+    #print("dim: "+ str(dim))
+    #print(str(shape) + " ordinal: " + str(ordinal))
+    strides = strides_from_shape(shape)
 
+    for i in range(dim):
+        #print("strides: " + str(strides[i]) + " for " + str(i))
+        if (i == 0):
+            out_index[i] = ordinal // strides[i]
+        else:
+            ordinal = ordinal - strides[i - 1] * out_index[i - 1]
+            out_index[i] = ordinal // strides[i]
+    #print(out_index)
 
 def broadcast_index(
     big_index: Index, big_shape: Shape, shape: Shape, out_index: OutIndex
@@ -84,7 +96,25 @@ def broadcast_index(
         None
     """
     # TODO: Implement for Task 2.2.
-    raise NotImplementedError("Need to implement for Task 2.2")
+    #raise NotImplementedError("Need to implement for Task 2.2")
+    #print("inside broadcast_index")
+    #print(big_index)
+    big_index_copy     = big_index.copy()
+    reversed_big_index = big_index_copy[::-1]
+    reversed_shape     = shape[::-1]
+    reversed_out_index = reversed_big_index
+    
+    # delete additonal dimision if shape < big_shape
+    if (len(shape) < len(big_shape)):
+        reversed_out_index = reversed_out_index[0:len(shape)]
+
+    for i in range(len(shape)):
+        if (reversed_shape[i] == 1):
+            reversed_out_index[i] = 0
+    out_index_temp = reversed_out_index[::-1]
+    for i in range(len(shape)):
+        out_index[i] = out_index_temp[i]
+    #print("exit broadcast_index")
 
 
 def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
@@ -102,8 +132,35 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
         IndexingError : if cannot broadcast
     """
     # TODO: Implement for Task 2.2.
-    raise NotImplementedError("Need to implement for Task 2.2")
+    #raise NotImplementedError("Need to implement for Task 2.2")
+    #print("Inside shape_broadcast:")
+    #print(shape1)
+    #print(shape2)
+    # check whether 2 shapes are broadcastable
+    if (len(shape1) > len(shape2)):
+        big_shape = shape1[::-1]
+        small_shape = shape2[::-1]
+    else:
+        big_shape = shape2[::-1]
+        small_shape = shape1[::-1]
+    
+    #print(big_shape)
+    #print(small_shape)
+    # check whetehr broadcastable
+    for big_element, small_element in zip(big_shape, small_shape):
+        if not ((big_element == small_element) or (big_element == 1) or (small_element == 1)):
+            raise IndexingError(f"Cannot broadcast for big element {big_element} and small_element {small_element}")
+    
+    reversed_broadcasted_shape = list(big_shape)
+    
+    for i, small_element in enumerate(small_shape):
+        if (big_shape[i] == 1):
+            reversed_broadcasted_shape[i] = small_element
+    
+    #print(reversed_broadcasted_shape)
 
+    #print("Leaving shape_broadcast:")
+    return tuple(reversed(reversed_broadcasted_shape))
 
 def strides_from_shape(shape: UserShape) -> UserStrides:
     layout = [1]
@@ -223,7 +280,13 @@ class TensorData:
         ), f"Must give a position to each dimension. Shape: {self.shape} Order: {order}"
 
         # TODO: Implement for Task 2.1.
-        raise NotImplementedError("Need to implement for Task 2.1")
+        #raise NotImplementedError("Need to implement for Task 2.1")
+        permuted_strides: UserStrides=[]
+        permuted_shape: UserShape = []
+        for i in range(self.dims):
+            permuted_strides.append(self.strides[order[i]])
+            permuted_shape.append(self.shape[order[i]])
+        return TensorData(self._storage, tuple(permuted_shape), tuple(permuted_strides))
 
     def to_string(self) -> str:
         s = ""
