@@ -337,6 +337,9 @@ class Tensor:
 
     def is_leaf(self) -> bool:
         "True if this variable created by the user (no `last_fn`)"
+        #print("inside is_leaf: ")
+        #print(self.history)
+        #print(self.history.last_fn)
         return self.history is not None and self.history.last_fn is None
 
     def is_constant(self) -> bool:
@@ -348,22 +351,41 @@ class Tensor:
         return self.history.inputs
 
     def chain_rule(self, d_output: Any) -> Iterable[Tuple[Variable, Any]]:
+        #print("chain_rule:")
+        #print(self)
+        #print(d_output)
         h = self.history
+        #print(h)
         assert h is not None
         assert h.last_fn is not None
         assert h.ctx is not None
 
         x = h.last_fn._backward(h.ctx, d_output)
+        #print("x:")
+        #print(x)
+        #print(len(x))
+        #print("h.inputs:")
+        #print(h.inputs)
+        #print(len(h.inputs))
         assert len(x) == len(h.inputs), f"Bug in function {h.last_fn}"
+        #for inp, d_in in zip(h.inputs, x):
+            #print("inp:")
+            #print(inp)
+            #print("d_in:")
+            #print(d_in)
+            #print(self._ensure_tensor(d_in))
         return [
             (inp, inp.expand(self._ensure_tensor(d_in)))
             for inp, d_in in zip(h.inputs, x)
         ]
 
     def backward(self, grad_output: Optional[Tensor] = None) -> None:
+        #print("Tensor backward:")
+        #print(self)
         if grad_output is None:
             assert self.shape == (1,), "Must provide grad_output if non-scalar"
             grad_output = Tensor.make([1.0], (1,), backend=self.backend)
+        #print(grad_output)
         backpropagate(self, grad_output)
 
     def zero_grad_(self) -> None:  # pragma: no cover

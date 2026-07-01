@@ -22,7 +22,10 @@ class Network(minitorch.Module):
 
     def forward(self, x):
         # TODO: Implement for Task 2.5.
-        raise NotImplementedError("Need to implement for Task 2.5")
+        #raise NotImplementedError("Need to implement for Task 2.5")
+        middle = self.layer1.forward(x).relu()
+        end    = self.layer2.forward(middle).relu()
+        return self.layer3.forward(end).sigmoid()
 
 
 class Linear(minitorch.Module):
@@ -34,7 +37,29 @@ class Linear(minitorch.Module):
 
     def forward(self, x):
         # TODO: Implement for Task 2.5.
-        raise NotImplementedError("Need to implement for Task 2.5")
+        #raise NotImplementedError("Need to implement for Task 2.5")
+        in_size  = self.weights.value.shape[0]
+        out_size = self.weights.value.shape[1]
+        pts      = x.shape[0]
+        #print("in_size: " + str(in_size))
+        #print("out_size: " + str(out_size))
+        #print("Linear forward:")
+        #print("bias:")
+        #print(self.bias.value)
+        #print(self.bias.value.shape)
+        #print("weights:")
+        #print(self.weights.value)
+        #print(self.weights.value.shape)
+        #print("x:")
+        #print(x)
+        #print(x.shape)
+        #print(((self.weights.value.view(1, in_size, out_size)) * x.view(50,in_size,1)))
+        #print(((self.weights.value.view(1, in_size, out_size)) * x.view(50,in_size,1)).shape)
+        #print(((self.weights.value.view(1, in_size, out_size)) * x.view(50,in_size,1)).sum(1))
+        #print(((self.weights.value.view(1, in_size, out_size)) * x.view(50,in_size,1)).sum(1).shape)
+        #print(((self.weights.value.view(1, in_size, out_size)) * x.view(50,in_size,1)).sum(1).view(50,out_size))
+        #print(((self.weights.value.view(1, in_size, out_size)) * x.view(50,in_size,1)).sum(1).view(50,out_size).shape)
+        return ((self.weights.value.view(1, in_size, out_size)) * x.view(pts,in_size,1)).sum(1).view(pts, out_size) + self.bias.value.view(1, out_size)
 
 
 def default_log_fn(epoch, total_loss, correct, losses):
