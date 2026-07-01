@@ -45,7 +45,10 @@ def index_to_position(index: Index, strides: Strides) -> int:
 
     # TODO: Implement for Task 2.1.
     #raise NotImplementedError("Need to implement for Task 2.1")
-    return np.dot(index, strides)
+    position = 0
+    for i in range(len(index)):
+        position = position + index[i] * strides[i]
+    return position
 
 def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
     """
@@ -65,15 +68,27 @@ def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
     dim = len(shape)
     #print("dim: "+ str(dim))
     #print(str(shape) + " ordinal: " + str(ordinal))
-    strides = strides_from_shape(shape)
+    total = 1
+    for i in range(dim):
+        total = total * shape[i]
 
+    #strides = np.ones(dim, dtype=np.int32)
+    mapped_positions = 0
     for i in range(dim):
         #print("strides: " + str(strides[i]) + " for " + str(i))
-        if (i == 0):
-            out_index[i] = ordinal // strides[i]
-        else:
-            ordinal = ordinal - strides[i - 1] * out_index[i - 1]
-            out_index[i] = ordinal // strides[i]
+        #if (i == 0):
+        #    out_index[i] = ordinal // strides[i]
+        #else:
+        #    ordinal = ordinal - strides[i - 1] * out_index[i - 1]
+        #    out_index[i] = ordinal // strides[i]
+
+        stride = 1
+        for j in range(i + 1, dim):
+            stride = stride * shape[j] 
+
+        out_index[i] = (ordinal - mapped_positions) // stride
+        mapped_positions = mapped_positions + stride * out_index[i]
+
     #print(out_index)
 
 def broadcast_index(
@@ -99,21 +114,35 @@ def broadcast_index(
     #raise NotImplementedError("Need to implement for Task 2.2")
     #print("inside broadcast_index")
     #print(big_index)
-    big_index_copy     = big_index.copy()
-    reversed_big_index = big_index_copy[::-1]
-    reversed_shape     = shape[::-1]
-    reversed_out_index = reversed_big_index
     
-    # delete additonal dimision if shape < big_shape
-    if (len(shape) < len(big_shape)):
-        reversed_out_index = reversed_out_index[0:len(shape)]
+    big_index_reversed = big_index[::-1]
+    big_index_reversed_truncated = big_index_reversed[0:len(shape)]
 
     for i in range(len(shape)):
-        if (reversed_shape[i] == 1):
-            reversed_out_index[i] = 0
-    out_index_temp = reversed_out_index[::-1]
-    for i in range(len(shape)):
-        out_index[i] = out_index_temp[i]
+        if (shape[i] == 1):
+            out_index[i] = 0
+        else:
+            out_index[i] = big_index_reversed_truncated[len(shape) - i - 1]
+            #print(big_index_reversed_truncated[len(shape) - i - 1])
+            #print(i)
+            #print(out_index[i])
+            #print("end")
+
+    #big_index_copy     = big_index.copy()
+    #reversed_big_index = big_index_copy[::-1]
+    #reversed_shape     = shape[::-1]
+    #reversed_out_index = reversed_big_index
+    #
+    ## delete additonal dimision if shape < big_shape
+    ##if (len(shape) < len(big_shape)):
+    #reversed_out_index = reversed_out_index[0:len(shape)]
+
+    #for i in range(len(shape)):
+    #    if (reversed_shape[i] == 1):
+    #        reversed_out_index[i] = 0
+    #out_index_temp = reversed_out_index[::-1]
+    #for i in range(len(shape)):
+    #    out_index[i] = out_index_temp[i]
     #print("exit broadcast_index")
 
 
@@ -163,12 +192,20 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
     return tuple(reversed(reversed_broadcasted_shape))
 
 def strides_from_shape(shape: UserShape) -> UserStrides:
-    layout = [1]
-    offset = 1
-    for s in reversed(shape):
-        layout.append(s * offset)
-        offset = s * offset
-    return tuple(reversed(layout[:-1]))
+    shape_length = len(shape)
+    layout = np.ones(shape_length, dtype=int)
+    total = 1
+    for i in range(shape_length):
+        total = total * shape[i]
+    for i in range(shape_length):
+        layout[i] = total / shape[i]
+        total = layout[i]
+    #layout = [1]
+    #offset = 1
+    #for s in reversed(shape):
+    #    layout.append(s * offset)
+    #    offset = s * offset
+    return tuple(layout)
 
 
 class TensorData:
